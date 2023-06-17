@@ -1,0 +1,55 @@
+class Solution {
+public:
+    map<pair<int,int>,int> mp;
+    int solver(int index,vector<int>& arr1,vector<int>& arr2,int prev){
+        if(index>=arr1.size()){
+            return 0;
+        }
+        if(mp.find({index,prev})!=mp.end()){
+            return mp[{index,prev}];
+        }
+        int result1=1e9+1;
+        if(arr1[index]>prev){
+            result1=solver(index+1,arr1,arr2,arr1[index]);
+        }
+        int result2=1e9+1;
+        auto it=upper_bound(arr2.begin(),arr2.end(),prev);
+        if(it!=arr2.end()){
+            result2=1+solver(index+1,arr1,arr2,arr2[it-arr2.begin()]);
+            // Here i was in the doubt that why are we using prev where we can simply access the element using arr1[index-1] but in the case of modifying if we modify the original array then it will get modified for all the cases as we are passing it by reference.
+        }
+        return mp[{index,prev}]=min(result1,result2);
+    }
+    int makeArrayIncreasing(vector<int>& arr1, vector<int>& arr2) {
+        /*
+        
+        Approach: 
+        
+        arr1 and arr2
+        minimum number of operations needed to make arr1 strictly increasing?
+        In this we will have to replace some elements of arr1 with arr2 when required so it's better to sort arr2 rather than searching everytime in O(n)
+        
+        Now, let's say 
+        
+        arr1 = [1,3,100,5]
+        arr2=[7,8]
+        
+        Now, according to greedy what we will do is we will replace element which is not greater than it's previous element is arr1.
+        But in the above case if we don't replace 100 then it's not possible to find a solution and still we will not replace 100 as it is not violating any conditions.
+        So, in this case greedy fails
+        Now, we will try using DP in which we will try all possibilities/
+        So, now there will be two case if there is no violation we will just do simple work.
+        But if there is violation or non violation we will still perform the second operation.
+        
+        Time complexity will be ~ O(2^n). as we can try to replace all the n elements.
+        
+        */
+        mp.clear();
+        sort(arr2.begin(),arr2.end());
+        int result=solver(0,arr1,arr2,INT_MIN);
+        if (result==1e9+1){
+            return -1;
+        }
+        return result;
+    }
+};
